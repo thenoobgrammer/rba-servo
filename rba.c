@@ -38,11 +38,11 @@ int main() {
     }
 
     // Move servo to 3 positions
-    setServo(fd, 0, 0, 307);  // Center position
+    setServo(fd, 4, 0, 307);  // Center position
     sleep(2);
-    setServo(fd, 0, 0, 205);  // Left
+    setServo(fd, 4, 0, 205);  // Left
     sleep(2);
-    setServo(fd, 0, 0, 410);  // Right
+    setServo(fd, 4, 0, 410);  // Right
     sleep(2);
 
     close(fd);
