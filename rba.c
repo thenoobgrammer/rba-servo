@@ -38,15 +38,18 @@ int main() {
     if (write(fd, mode2, 2) != 2) {
         perror("Failed to set MODE2");
     }
-
-    setServo(fd, 4, 0, 307);
+ 	
+	unsigned char buf[4];
+    
+	setServo(fd, 4, 0, 307);
+	read_registers(fd, 0x06 + 4 * 4, buf, 4);
     sleep(2);
     setServo(fd, 4, 0, 205);
+	read_registers(fd, 0x06 + 4 * 4, buf, 4);
     sleep(2);
     setServo(fd, 4, 0, 410);
     sleep(2);
-
-    unsigned char buf[4];
+   
     read_registers(fd, 0x06 + 4 * 4, buf, 4);
     printf("PWM settings for channel 4: ON_L=0x%02X, ON_H=0x%02X, OFF_L=0x%02X, OFF_H=0x%02X\n",
            buf[0], buf[1], buf[2], buf[3]);
