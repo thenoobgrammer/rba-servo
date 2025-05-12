@@ -36,6 +36,17 @@ int main()
 
 	i2c_smbus_write_byte_data(fd, MODE1, 0x00);
 
+	usleep(5000);
+
+	unsigned char oldmode = i2c_smbus_read_byte_data(fd, MODE1);
+	unsigned char newmode = (oldmode & 0x7F) | 0x10;
+	i2c_smbus_write_byte_data(fd, MODE1, newmode);
+
+	i2c_smbus_write_byte_data(fd, PRESCALE, 121);
+
+	i2c_smbus_write_byte_data(fd, MODE1, oldmode);
+	usleep(5000);
+
 	setPWM(fd, 4, 0, 375);
 
 	close(fd);
