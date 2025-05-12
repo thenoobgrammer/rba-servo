@@ -47,7 +47,26 @@ int main()
 	i2c_smbus_write_byte_data(fd, MODE1, oldmode);
 	usleep(5000);
 
-	setPWM(fd, 4, 0, 375);
+	int curr_angle = 150;
+	int delta = 225;
+	int direction;
+	int loop_count = 50;
+
+	for (int i = 0; i < loop_count; i++)
+	{
+		if (curr_angle <= 150)
+		{
+			direction = 1;
+		}
+		else if (curr_angle >= 600)
+		{
+			direction = -1;
+		}
+		curr_angle += (225 * direction);
+
+		setPWM(fd, 15, 0, curr_angle);
+		usleep(1000000); // 1 second
+	}
 
 	close(fd);
 	return 0;
