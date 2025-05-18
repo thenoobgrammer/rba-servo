@@ -48,7 +48,6 @@ int main()
 	usleep(5000);
 
 	int curr_angle = 150;
-	int delta = 225;
 	int direction;
 	int loop_count = 50;
 
