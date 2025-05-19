@@ -85,8 +85,8 @@ int main()
 	i2c_smbus_write_byte_data(fd, MODE1, oldmode);
 	usleep(5000);
 
-	sweepServoSlow(fd, 15, 0, 180, 10000);
-	sweepServoSlow(fd, 15, 180, 0, 10000);
+	sweepServoSlow(fd, SERVO_01, 0, 180, 10000);
+	sweepServoSlow(fd, SERVO_01, 180, 0, 10000);
 
 	close(fd);
 	return 0;
