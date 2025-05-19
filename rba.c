@@ -17,6 +17,15 @@
 #define SERVO_05 0x04 // 4
 #define SERVO_06 0x00 // 0
 
+void setPWM(int fd, int channel, int on, int off)
+{
+	int reg = 0x06 + 4 * channel;
+	i2c_smbus_write_byte_data(fd, reg, on & 0xFF);
+	i2c_smbus_write_byte_data(fd, reg + 1, (on >> 8) & 0x0F);
+	i2c_smbus_write_byte_data(fd, reg + 2, off & 0xFF);
+	i2c_smbus_write_byte_data(fd, reg + 3, (off >> 8) & 0x0F);
+}
+
 void sweepServoSlow(int fd, int channel, int start_angle, int end_angle, int delay_us)
 {
 	if (start_angle > end_angle)
@@ -37,15 +46,6 @@ void sweepServoSlow(int fd, int channel, int start_angle, int end_angle, int del
 			usleep(delay_us);
 		}
 	}
-}
-
-void setPWM(int fd, int channel, int on, int off)
-{
-	int reg = 0x06 + 4 * channel;
-	i2c_smbus_write_byte_data(fd, reg, on & 0xFF);
-	i2c_smbus_write_byte_data(fd, reg + 1, (on >> 8) & 0x0F);
-	i2c_smbus_write_byte_data(fd, reg + 2, off & 0xFF);
-	i2c_smbus_write_byte_data(fd, reg + 3, (off >> 8) & 0x0F);
 }
 
 int angleToPWM(int angle)
