@@ -1,102 +1,93 @@
-#include <linux/i2c-dev.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <fcntl.h>
-#include <errno.h>
+#include <linux/i2c-dev.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <i2c/smbus.h>
 
-#define I2C_DEV "/dev/i2c-1"
-#define PCA9685_ADDR 0x40
+#define PCA9685_ADDR 0X40
+#define MODE1 0X00
+#define PRESCALE 0XFE
 
-void setServo(int fd, int channel, int tick_on, int tick_off);
-void pca9685_enter_sleep(int fd);
-void pca9685_exit_sleep(int fd);
-void read_registers(int fd, unsigned char reg, unsigned char* buf, int len);
+#define SERVO_01 0xF  // 15
+#define SERVO_02 0xC  // 12
+#define SERVO_03 0x08 // 8
+#define SERVO_04 0x07 // 7
+#define SERVO_05 0x04 // 4
+#define SERVO_06 0x00 // 0
 
-int main() {
-    int fd = open(I2C_DEV, O_RDWR);
-    if (fd < 0) {
-        perror("Failed to open I2C device");
-        return 1;
-    }
-    if (ioctl(fd, I2C_SLAVE, PCA9685_ADDR) < 0) {
-        perror("Failed to select PCA9685");
-        close(fd);
-        return 1;
-    }
-
-    pca9685_enter_sleep(fd);
-
-    unsigned char prescale[] = {0xFE, 121};
-    if (write(fd, prescale, 2) != 2) {
-        perror("Failed to write prescale");
-    }
-
-    pca9685_exit_sleep(fd);
-
-    unsigned char mode2[] = {0x01, 0x04};
-    if (write(fd, mode2, 2) != 2) {
-        perror("Failed to set MODE2");
-    }
- 	
-	unsigned char buf[4];
-    
-	setServo(fd, 4, 0, 307);
-	read_registers(fd, 0x06 + 4 * 4, buf, 4);
-    sleep(2);
-    setServo(fd, 4, 0, 205);
-	read_registers(fd, 0x06 + 4 * 4, buf, 4);
-    sleep(2);
-    setServo(fd, 4, 0, 410);
-    sleep(2);
-   
-    read_registers(fd, 0x06 + 4 * 4, buf, 4);
-    printf("PWM settings for channel 4: ON_L=0x%02X, ON_H=0x%02X, OFF_L=0x%02X, OFF_H=0x%02X\n",
-           buf[0], buf[1], buf[2], buf[3]);
-
-    close(fd);
-    return 0;
+void sweepServoSlow(int fd, int channel, int start_angle, int end_angle, int delay_us)
+{
+	if (start_angle > end_angle)
+	{
+		for (int angle = start_angle; angle >= end_angle; angle--)
+		{
+			int pwm = 150 + (int)((600 - 150) * (angle / 180.0));
+			setPWM(fd, channel, 0, pwm);
+			usleep(delay_us);
+		}
+	}
+	else
+	{
+		for (int angle = start_angle; angle <= end_angle; angle++)
+		{
+			int pwm = 150 + (int)((600 - 150) * (angle / 180.0));
+			setPWM(fd, channel, 0, pwm);
+			usleep(delay_us);
+		}
+	}
 }
 
-void pca9685_enter_sleep(int fd) {
-    unsigned char buf[2] = {0x00, 0x10};
-    if (write(fd, buf, 2) != 2) {
-        perror("Failed to enter sleep mode");
-    }
+void setPWM(int fd, int channel, int on, int off)
+{
+	int reg = 0x06 + 4 * channel;
+	i2c_smbus_write_byte_data(fd, reg, on & 0xFF);
+	i2c_smbus_write_byte_data(fd, reg + 1, (on >> 8) & 0x0F);
+	i2c_smbus_write_byte_data(fd, reg + 2, off & 0xFF);
+	i2c_smbus_write_byte_data(fd, reg + 3, (off >> 8) & 0x0F);
 }
 
-void pca9685_exit_sleep(int fd) {
-    unsigned char buf[2] = {0x00, 0x20};
-    if (write(fd, buf, 2) != 2) {
-        perror("Failed to exit sleep mode");
-    }
-    usleep(1000);
+int angleToPWM(int angle)
+{
+	if (angle < 0)
+		angle = 0;
+	if (angle > 180)
+		angle = 180;
+	return 150 + (int)((600 - 150) * (angle / 180.0));
 }
 
-void setServo(int fd, int channel, int tick_on, int tick_off) {
-    unsigned char data[5];
-    data[0] = 0x06 + 4 * channel;
-    data[1] = tick_on & 0xFF;
-    data[2] = (tick_on >> 8) & 0x0F;
-    data[3] = tick_off & 0xFF;
-    data[4] = (tick_off >> 8) & 0x0F;
-    if (write(fd, data, 5) != 5) {
-        perror("Failed to write PWM values");
-    }
-}
+int main()
+{
+	int fd = open("/dev/i2c-1", O_RDWR);
+	if (fd < 0)
+	{
+		perror("open");
+		exit(1);
+	}
 
-void read_registers(int fd, unsigned char reg, unsigned char* buf, int len) {
-    if (write(fd, &reg, 1) != 1) {
-        perror("Failed to set register address for read");
-        return;
-    }
-    if (read(fd, buf, len) != len) {
-        perror("Failed to read from I2C register");
-    } else {
-        printf("Read %d bytes from register 0x%02X: ", len, reg);
-        for (int i = 0; i < len; i++) {
-            printf("0x%02X ", buf[i]);
-        }
-        printf("\n");
-    }
+	if (ioctl(fd, I2C_SLAVE, PCA9685_ADDR) < 0)
+	{
+		perror("ioctl");
+		exit(1);
+	}
+
+	i2c_smbus_write_byte_data(fd, MODE1, 0x00);
+
+	usleep(5000);
+
+	unsigned char oldmode = i2c_smbus_read_byte_data(fd, MODE1);
+	unsigned char newmode = (oldmode & 0x7F) | 0x10;
+	i2c_smbus_write_byte_data(fd, MODE1, newmode);
+
+	i2c_smbus_write_byte_data(fd, PRESCALE, 121);
+
+	i2c_smbus_write_byte_data(fd, MODE1, oldmode);
+	usleep(5000);
+
+	sweepServoSlow(fd, 15, 0, 180, 10000);
+	sweepServoSlow(fd, 15, 180, 0, 10000);
+
+	close(fd);
+	return 0;
 }
