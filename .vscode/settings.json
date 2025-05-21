@@ -4,6 +4,7 @@
         "*.ts": "typescript",
         "*.asm": "asm-collection",
         "stdio.h": "c",
-        "unistd.h": "c"
+        "unistd.h": "c",
+        "ioctl.h": "c"
     }
 }
