@@ -11,7 +11,7 @@
 #define PRESCALE 0XFE
 
 #define SERVO_01 0xF  // 15
-#define SERVO_02 0xC  // 12
+#define SERVO_02 0xB  // 11
 #define SERVO_03 0x08 // 8
 #define SERVO_04 0x07 // 7
 #define SERVO_05 0x04 // 4
@@ -46,6 +46,7 @@ void sweepServoSlow(int fd, int channel, int start_angle, int end_angle, int del
 			usleep(delay_us);
 		}
 	}
+	setPWM(fd, channel, 0, 0);
 }
 
 int angleToPWM(int angle)
@@ -84,9 +85,10 @@ int main()
 
 	i2c_smbus_write_byte_data(fd, MODE1, oldmode);
 	usleep(5000);
+	
+	sweepServoSlow(fd, SERVO_02, 0, 60, 10000);
+	sweepServoSlow(fd, SERVO_02, 60, 0, 10000);
 
-	sweepServoSlow(fd, SERVO_01, 0, 180, 10000);
-	sweepServoSlow(fd, SERVO_01, 180, 0, 10000);
 
 	close(fd);
 	return 0;
