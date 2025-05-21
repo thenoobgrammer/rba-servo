@@ -43,14 +43,6 @@ void sweepServoSlow(int fd, int channel, int start_angle, int end_angle,
   setPWM(fd, channel, 0, 0);
 }
 
-int angleToPWM(int angle) {
-  if (angle < 0)
-    angle = 0;
-  if (angle > 180)
-    angle = 180;
-  return 150 + (int)((600 - 150) * (angle / 180.0));
-}
-
 int main() {
   int fd = open("/dev/i2c-1", O_RDWR);
   if (fd < 0) {
@@ -75,9 +67,13 @@ int main() {
 
   i2c_smbus_write_byte_data(fd, MODE1, oldmode);
   usleep(5000);
+	
+  sweepServoSlow(fd, SERVO_01, 0, 90, 25000);
+  sweepServoSlow(fd, SERVO_01, 90, 0, 25000);
 
-  sweepServoSlow(fd, SERVO_02, 0, 60, 10000);
-  sweepServoSlow(fd, SERVO_02, 60, 0, 10000);
+
+  sweepServoSlow(fd, SERVO_02, 20, 120, 25000);
+  sweepServoSlow(fd, SERVO_02, 120, 20, 25000);
 
   close(fd);
   return 0;
