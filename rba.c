@@ -6,10 +6,13 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include "rba.h"
+#include "input.h"
 
 #define PCA9685_ADDR 0X40
 #define MODE1 0X00
 #define PRESCALE 0XFE
+
+#define NUM_SERVOS 6
 
 #define SERVO_01 0xF  // 15
 #define SERVO_02 0xB  // 11
@@ -27,7 +30,7 @@ void setPWM(int fd, int channel, int on, int off)
   i2c_smbus_write_byte_data(fd, reg + 3, (off >> 8) & 0x0F);
 }
 
-void sweepServoSlow(int fd, int channel, int direction, int start_angle, int end_angle, int delay_us)
+void moveServo(int fd, int channel, int direction, int start_angle, int end_angle, int delay_us)
 {
   for (float angle = start_angle; angle >= end_angle; angle += (int)(direction * 0.5))
   {
@@ -35,19 +38,7 @@ void sweepServoSlow(int fd, int channel, int direction, int start_angle, int end
     setPWM(fd, channel, 0, pwm);
     usleep(delay_us);
   }
-  // if (start_angle > end_angle) {
-  //   for (float angle = start_angle; angle >= end_angle; angle -= 0.5) {
-  //     int pwm = 150 + (int)((600 - 150) * (angle / 180.0));
-  //     setPWM(fd, channel, 0, pwm);
-  //     usleep(delay_us);
-  //   }
-  // } else {
-  //   for (float angle = start_angle; angle <= end_angle; angle += 0.5) {
-  //     int pwm = 150 + (int)((600 - 150) * (angle / 180.0));
-  //     setPWM(fd, channel, 0, pwm);
-  //     usleep(delay_us);
-  //   }
-  // }
+
   setPWM(fd, channel, 0, 0);
 }
 
@@ -79,6 +70,46 @@ int main()
   i2c_smbus_write_byte_data(fd, MODE1, oldmode);
   usleep(5000);
 
+  int selected_servo = 0;  // Start with servo 1 (index 0)
+      int servo_angles[NUM_SERVOS] = {90, 90, 90, 90, 90, 90}; // initial angles
+
+      setTerminalRawMode(1);
+      printf(
+          "Select servo (1-6), then use ← or → arrows. Press 'q' to quit.\n"
+      );
+
+  while (1) {
+          printf("\rServo %d selected. Current angle: %d   ",
+                  selected_servo + 1, servo_angles[selected_servo]);
+          fflush(stdout);
+
+          char k = get_key();
+
+          if (k == 'q') break;
+
+          if (k >= '1' && k <= '6') {
+              selected_servo = k - '1';
+              printf("\nServo %d is now selected.\n", selected_servo + 1);
+              continue;
+          }
+
+          int step = 5;
+          if (k == 'C') { // Right arrow
+              if (servo_angles[selected_servo] < 180)
+                  servo_angles[selected_servo] += step;
+              printf("\nServo %d angle increased to %d\n", selected_servo + 1, servo_angles[selected_servo]);
+              // CALL YOUR SERVO CONTROL HERE
+              // move_servo(selected_servo, servo_angles[selected_servo]);
+          } else if (k == 'D') { // Left arrow
+              if (servo_angles[selected_servo] > 0)
+                  servo_angles[selected_servo] -= step;
+              printf("\nServo %d angle decreased to %d\n", selected_servo + 1, servo_angles[selected_servo]);
+              // CALL YOUR SERVO CONTROL HERE
+              // move_servo(selected_servo, servo_angles[selected_servo]);
+          }
+      }
+
+   setTerminalRawMode(0);
   sweepServoSlow(fd, SERVO_01, 0, 90, 25000);
   sweepServoSlow(fd, SERVO_01, 90, 0, 25000);
 
