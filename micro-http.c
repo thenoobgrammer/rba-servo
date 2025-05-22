@@ -8,7 +8,8 @@
 #define PORT 8084
 #define BUFFER_SIZE 1024
 
-int main() {
+int main()
+{
   int server_fd, new_socket;
   struct sockaddr_in address;
   int opt = 1;
@@ -18,14 +19,16 @@ int main() {
                    "text/plain\r\nContent-Length: 12\r\n\r\nHello world!";
 
   // Creating socket file descriptor
-  if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+  if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
+  {
     perror("socket failed");
     exit(EXIT_FAILURE);
   }
 
   // Forcefully attaching socket to the port 8080
   if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt,
-                 sizeof(opt))) {
+                 sizeof(opt)))
+  {
     perror("setsockopt");
     exit(EXIT_FAILURE);
   }
@@ -34,23 +37,27 @@ int main() {
   address.sin_port = htons(PORT);
 
   // Binding the socket to the address
-  if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
+  if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
+  {
     perror("bind failed");
     exit(EXIT_FAILURE);
   }
 
   // Listening for connections
-  if (listen(server_fd, 3) < 0) {
+  if (listen(server_fd, 3) < 0)
+  {
     perror("listen failed");
     exit(EXIT_FAILURE);
   }
 
   printf("Server listening on port %d\n", PORT);
 
-  while (1) {
+  while (1)
+  {
     // Accepting and handling connections
     if ((new_socket =
-             accept(server_fd, (struct sockaddr *)&address, &addrlen)) < 0) {
+             accept(server_fd, (struct sockaddr *)&address, &addrlen)) < 0)
+    {
       perror("accept failed");
       exit(EXIT_FAILURE);
     }

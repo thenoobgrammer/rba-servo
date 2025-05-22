@@ -5,6 +5,7 @@
         "*.asm": "asm-collection",
         "stdio.h": "c",
         "unistd.h": "c",
-        "ioctl.h": "c"
+        "ioctl.h": "c",
+        "input.h": "c"
     }
 }
