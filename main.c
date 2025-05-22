@@ -1,9 +1,17 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <signal.h>
 #include "input.h"
 #include "servo.h"
 
 #define NUM_SERVOS 6
+
+void handle_sigint(int sig)
+{
+    printf("\nCaught SIGINT, cleaning up...\n");
+    closeFd();
+    exit(0);
+}
 
 int main()
 {
@@ -60,11 +68,4 @@ int main()
 
     setTerminalRawMode(0);
     closeFd();
-}
-
-void handle_sigint(int sig)
-{
-    printf("\nCaught SIGINT, cleaning up...\n");
-    closeFd();
-    exit(0);
 }
