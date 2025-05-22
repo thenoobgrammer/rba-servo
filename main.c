@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <signal.h>
 #include "input.h"
 #include "servo.h"
 
@@ -6,6 +7,8 @@
 
 int main()
 {
+    signal(SIGINT, handle_sigint);
+
     openFd();
     int selected_servo = 0;
     int servo_angles[NUM_SERVOS] = {90, 90, 90, 90, 90, 90};
@@ -57,4 +60,11 @@ int main()
 
     setTerminalRawMode(0);
     closeFd();
+}
+
+void handle_sigint(int sig)
+{
+    printf("\nCaught SIGINT, cleaning up...\n");
+    closeFd();
+    exit(0);
 }

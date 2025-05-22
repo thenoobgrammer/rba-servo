@@ -48,6 +48,12 @@ void openFd()
 
 void closeFd()
 {
+  setPWM(fd, SERVO_01, 0, pwm);
+  setPWM(fd, SERVO_02, 0, pwm);
+  setPWM(fd, SERVO_03, 0, pwm);
+  setPWM(fd, SERVO_04, 0, pwm);
+  setPWM(fd, SERVO_05, 0, pwm);
+  setPWM(fd, SERVO_06, 0, pwm);
   close(fd);
 }
 
