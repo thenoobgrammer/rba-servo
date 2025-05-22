@@ -13,6 +13,15 @@
 
 static int fd = -1;
 
+void setPWM(int fd, int channel, int on, int off)
+{
+  int reg = 0x06 + 4 * channel;
+  i2c_smbus_write_byte_data(fd, reg, on & 0xFF);
+  i2c_smbus_write_byte_data(fd, reg + 1, (on >> 8) & 0x0F);
+  i2c_smbus_write_byte_data(fd, reg + 2, off & 0xFF);
+  i2c_smbus_write_byte_data(fd, reg + 3, (off >> 8) & 0x0F);
+}
+
 void openFd()
 {
   fd = open("/dev/i2c-1", O_RDWR);
@@ -39,21 +48,13 @@ void openFd()
 
 void closeFd()
 {
-  close(fd);
-}
-
-void setPWM(int fd, int channel, int on, int off)
-{
-  int reg = 0x06 + 4 * channel;
-  i2c_smbus_write_byte_data(fd, reg, on & 0xFF);
-  i2c_smbus_write_byte_data(fd, reg + 1, (on >> 8) & 0x0F);
-  i2c_smbus_write_byte_data(fd, reg + 2, off & 0xFF);
-  i2c_smbus_write_byte_data(fd, reg + 3, (off >> 8) & 0x0F);
+    close(fd);
 }
 
 void moveServo(int channel, int angle)
 {
   int pwm = 150 + (int)((600 - 150) * (angle / 180.0));
   setPWM(fd, channel, 0, pwm);
-  setPWM(fd, channel, 0, 0); // release the servo's torque mechanism
+setPWM(fd, channel, 0, 0); // release the servo's torque mechanism
+
 }
