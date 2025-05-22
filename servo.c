@@ -51,10 +51,9 @@ void setPWM(int fd, int channel, int on, int off)
   i2c_smbus_write_byte_data(fd, reg + 3, (off >> 8) & 0x0F);
 }
 
-void moveServo(int channel, int direction, int angle)
+void moveServo(int channel, int angle)
 {
-  int new_angle = curr_angle += (direction * SERVO_STEP);
-  int pwm = 150 + (int)((600 - 150) * (new_angle / 180.0));
+  int pwm = 150 + (int)((600 - 150) * (angle / 180.0));
   setPWM(fd, channel, 0, pwm);
   setPWM(fd, channel, 0, 0); // release the servo's torque mechanism
 }
