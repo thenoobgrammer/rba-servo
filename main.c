@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <unistd.h>
 #include "input.h"
 #include "servo.h"
 
@@ -10,6 +11,7 @@ void handle_sigint(int sig)
 {
     printf("\nCaught SIGINT, cleaning up...\n");
     closeFd();
+    sleep(1);
     restoreTerminal();
     exit(0);
 }
