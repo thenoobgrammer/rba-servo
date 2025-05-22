@@ -35,13 +35,11 @@ void openFd()
   i2c_smbus_write_byte_data(fd, MODE1, newmode);
   i2c_smbus_write_byte_data(fd, PRESCALE, 121);
   i2c_smbus_write_byte_data(fd, MODE1, oldmode);
-
-  return 1;
 }
 
-int closeFd()
+void closeFd()
 {
-  return close(fd);
+  close(fd);
 }
 
 void setPWM(int fd, int channel, int on, int off)
@@ -53,7 +51,7 @@ void setPWM(int fd, int channel, int on, int off)
   i2c_smbus_write_byte_data(fd, reg + 3, (off >> 8) & 0x0F);
 }
 
-void moveServo(int channel, int direction)
+void moveServo(int channel, int direction, int angle)
 {
   int new_angle = curr_angle += (direction * SERVO_STEP);
   int pwm = 150 + (int)((600 - 150) * (new_angle / 180.0));

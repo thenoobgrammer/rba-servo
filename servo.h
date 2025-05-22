@@ -14,6 +14,6 @@
 
 void openFd();
 void closeFd();
-void moveServo(int channel, int direction);
+void moveServo(int channel, int direction, int angle);
 
 #endif

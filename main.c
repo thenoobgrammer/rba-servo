@@ -37,8 +37,8 @@ int main()
         { // Right arrow
             if (servo_angles[selected_servo] < 180)
             {
-                servo_angles[selected_servo] += SERVO_STEP;
-                moveServo(servo_chs[selected_servo], SERVO_RIGHT);
+                int angle = servo_angles[selected_servo] += SERVO_STEP;
+                moveServo(servo_chs[selected_servo], SERVO_RIGHT, angle);
             }
             printf("\nServo %d angle increased to %d\n", selected_servo + 1,
                    servo_angles[selected_servo]);
@@ -47,8 +47,8 @@ int main()
         { // Left arrow
             if (servo_angles[selected_servo] > 0)
             {
-                servo_angles[selected_servo] -= SERVO_STEP;
-                moveServo(servo_chs[selected_servo], SERVO_LEFT);
+                int angle = servo_angles[selected_servo] -= SERVO_STEP;
+                moveServo(servo_chs[selected_servo], SERVO_LEFT, angle);
             }
             printf("\nServo %d angle decreased to %d\n", selected_servo + 1,
                    servo_angles[selected_servo]);
