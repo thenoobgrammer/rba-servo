@@ -54,6 +54,9 @@ void closeFd()
   setPWM(fd, SERVO_04, 0, 0);
   setPWM(fd, SERVO_05, 0, 0);
   setPWM(fd, SERVO_06, 0, 0);
+
+  usleep(500000);
+
   close(fd);
 }
 
