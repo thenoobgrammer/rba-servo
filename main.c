@@ -6,8 +6,10 @@
 
 int main()
 {
+    openFd();
     int selected_servo = 0;
     int servo_angles[NUM_SERVOS] = {90, 90, 90, 90, 90, 90};
+    int servo_chs[NUM_SERVOS] = {SERVO_01, SERVO_02, SERVO_03, SERVO_04, SERVO_05, SERVO_06};
 
     setTerminalRawMode(1);
     printf("Select servo (1-6), then use ← or → arrows. Press 'q' to quit.\n");
@@ -34,18 +36,25 @@ int main()
         if (k == 'C')
         { // Right arrow
             if (servo_angles[selected_servo] < 180)
-                servo_angles[selected_servo] += step;
+            {
+                servo_angles[selected_servo] += SERVO_STEP;
+                moveServo(servo_chs[selected_servo], SERVO_RIGHT);
+            }
             printf("\nServo %d angle increased to %d\n", selected_servo + 1,
                    servo_angles[selected_servo]);
         }
         else if (k == 'D')
         { // Left arrow
             if (servo_angles[selected_servo] > 0)
-                servo_angles[selected_servo] -= step;
+            {
+                servo_angles[selected_servo] -= SERVO_STEP;
+                moveServo(servo_chs[selected_servo], SERVO_LEFT);
+            }
             printf("\nServo %d angle decreased to %d\n", selected_servo + 1,
                    servo_angles[selected_servo]);
         }
     }
 
     setTerminalRawMode(0);
+    closeFd();
 }

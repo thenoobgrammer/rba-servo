@@ -11,16 +11,9 @@
 #define MODE1 0X00
 #define PRESCALE 0XFE
 
-#define SERVO_01 0xF  // 15
-#define SERVO_02 0xB  // 11
-#define SERVO_03 0x08 // 8
-#define SERVO_04 0x07 // 7
-#define SERVO_05 0x04 // 4
-#define SERVO_06 0x00 // 0
-
 static int fd = -1;
 
-int openFd()
+void openFd()
 {
   fd = open("/dev/i2c-1", O_RDWR);
   if (fd < 0)
@@ -60,11 +53,10 @@ void setPWM(int fd, int channel, int on, int off)
   i2c_smbus_write_byte_data(fd, reg + 3, (off >> 8) & 0x0F);
 }
 
-void moveServo(int fd, int channel, int direction, int curr_angle)
+void moveServo(int channel, int direction)
 {
-  int angle = curr_angle += (direction * 0.5);
-  int pwm = 150 + (int)((600 - 150) * (curr_angle / 180.0));
+  int new_angle = curr_angle += (direction * SERVO_STEP);
+  int pwm = 150 + (int)((600 - 150) * (new_angle / 180.0));
   setPWM(fd, channel, 0, pwm);
-  // usleep(20000);
   setPWM(fd, channel, 0, 0); // release the servo's torque mechanism
 }
