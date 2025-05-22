@@ -21,15 +21,8 @@ int main()
 
     openFd();
     int selected_servo = 0;
-    int servo_angles[NUM_SERVOS] = {0, 0, 0, 0, 0, 0};
+    int servo_angles[NUM_SERVOS] = {SERVO_01_START_ANGLE, SERVO_02_START_ANGLE, SERVO_03_START_ANGLE, 0, 0, 0};
     int servo_chs[NUM_SERVOS] = {SERVO_01, SERVO_02, SERVO_03, SERVO_04, SERVO_05, SERVO_06};
-
-    moveServo(SERVO_01, 20);
-    servo_angles[0] = 20;
-    moveServo(SERVO_02, 20);
-    servo_angles[1] = 20;
-    moveServo(SERVO_03, 20);
-    servo_angles[2] = 20;
 
     setTerminalRawMode(1);
     printf("Select servo (1-6), then use ← or → arrows. Press 'q' to quit.\n");

@@ -44,16 +44,17 @@ void openFd()
   i2c_smbus_write_byte_data(fd, MODE1, newmode);
   i2c_smbus_write_byte_data(fd, PRESCALE, 121);
   i2c_smbus_write_byte_data(fd, MODE1, oldmode);
+
+  setPWM(fd, SERVO_01, 0, pwm(SERVO_01_START_ANGLE));
+  setPWM(fd, SERVO_02, 0, pwm(SERVO_02_START_ANGLE));
+  setPWM(fd, SERVO_03, 0, pwm(SERVO_03_START_ANGLE));
 }
 
 void closeFd()
 {
-  setPWM(fd, SERVO_01, 0, 0);
-  setPWM(fd, SERVO_02, 0, 0);
-  setPWM(fd, SERVO_03, 0, 0);
-  setPWM(fd, SERVO_04, 0, 0);
-  setPWM(fd, SERVO_05, 0, 0);
-  setPWM(fd, SERVO_06, 0, 0);
+  setPWM(fd, SERVO_01, 0, pwm(SERVO_01_START_ANGLE));
+  setPWM(fd, SERVO_02, 0, pwm(SERVO_02_START_ANGLE));
+  setPWM(fd, SERVO_03, 0, pwm(SERVO_03_START_ANGLE));
 
   usleep(500000);
 
@@ -62,7 +63,10 @@ void closeFd()
 
 void moveServo(int channel, int angle)
 {
-  int pwm = 150 + (int)((600 - 150) * (angle / 180.0));
-  setPWM(fd, channel, 0, pwm);
-  // setPWM(fd, channel, 0, 0); // release the servo's torque mechanism
+  setPWM(fd, channel, 0, pwm(angle));
+}
+
+int pwm(int angle)
+{
+  return 150 + (int)((600 - 150) * (angle / 180.0));
 }
