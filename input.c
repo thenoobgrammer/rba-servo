@@ -3,15 +3,16 @@
 #include <unistd.h>
 #include "input.h"
 
+static struct termios oldt;
+
 void restoreTerminal()
 {
-  static struct termios oldt;
   tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
 }
 
 void setTerminalRawMode(int enable)
 {
-  static struct termios oldt, newt;
+  static struct termios newt;
   static int initialized = 0;
   if (!initialized)
   {
