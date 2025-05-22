@@ -10,6 +10,7 @@ void handle_sigint(int sig)
 {
     printf("\nCaught SIGINT, cleaning up...\n");
     closeFd();
+    restoreTerminal();
     exit(0);
 }
 

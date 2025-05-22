@@ -3,6 +3,12 @@
 #include <unistd.h>
 #include "input.h"
 
+void restoreTerminal()
+{
+  static struct termios oldt;
+  tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+}
+
 void setTerminalRawMode(int enable)
 {
   static struct termios oldt, newt;
