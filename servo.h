@@ -1,7 +1,7 @@
 #ifndef SERVO_H_
 #define SERVO_H_
 
-#define SERVO_STEP 0.5
+#define SERVO_STEP 1
 #define SERVO_LEFT -1
 #define SERVO_RIGHT 1
 
