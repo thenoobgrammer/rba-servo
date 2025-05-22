@@ -48,13 +48,12 @@ void openFd()
 
 void closeFd()
 {
-    close(fd);
+  close(fd);
 }
 
 void moveServo(int channel, int angle)
 {
   int pwm = 150 + (int)((600 - 150) * (angle / 180.0));
   setPWM(fd, channel, 0, pwm);
-setPWM(fd, channel, 0, 0); // release the servo's torque mechanism
-
+  // setPWM(fd, channel, 0, 0); // release the servo's torque mechanism
 }
